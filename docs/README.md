@@ -1,3 +1,27 @@
+# Design and Analysis of Algorithms
+
+This repository contains implementations of various algorithms categorized by their design paradigms. The goal is to provide clear, efficient, and well-documented implementations of algorithms commonly used in computer science.
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Project Structure](#project-structure)
+- [Implemented Algorithms](#implemented-algorithms)
+  - [Greedy Algorithms](#greedy-algorithms)
+  - [Divide and Conquer](#divide-and-conquer)
+  - [Dynamic Programming](#dynamic-programming)
+  - [Graph Algorithms](#graph-algorithms)
+- [How to Run](#how-to-run)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Overview
+
+This project is a collection of algorithm implementations written in Python. Each algorithm is implemented with clarity and efficiency in mind, accompanied by example usage to demonstrate its functionality.
+
+The repository is structured to make it easy to navigate and understand the different algorithmic paradigms.
 
 ---
 
