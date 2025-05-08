@@ -101,6 +101,52 @@ def run_floyd_warshall():
     print("Shortest distances between every pair of vertices:")
     for row in result:
         print(row)
+def run_depth_first_search():
+    print("Running Depth First Search...")
+    graph = {}
+    n = int(input("Enter the number of vertices: "))
+    for _ in range(n):
+        vertex = input("Enter vertex: ")
+        neighbors = input(f"Enter neighbors of {vertex} (space-separated): ").split()
+        graph[vertex] = neighbors
+    start_vertex = input("Enter the starting vertex: ")
+
+    visited = set()
+
+    def dfs(vertex):
+        if vertex not in visited:
+            print(vertex, end=" ")
+            visited.add(vertex)
+            for neighbor in graph.get(vertex, []):
+                dfs(neighbor)
+
+    print("DFS Traversal:")
+    dfs(start_vertex)
+    print()
+
+
+def run_breadth_first_search():
+    print("Running Breadth First Search...")
+    graph = {}
+    n = int(input("Enter the number of vertices: "))
+    for _ in range(n):
+        vertex = input("Enter vertex: ")
+        neighbors = input(f"Enter neighbors of {vertex} (space-separated): ").split()
+        graph[vertex] = neighbors
+    start_vertex = input("Enter the starting vertex: ")
+
+    visited = set()
+    queue = [start_vertex]
+
+    print("BFS Traversal:")
+    while queue:
+        vertex = queue.pop(0)
+        if vertex not in visited:
+            print(vertex, end=" ")
+            visited.add(vertex)
+            queue.extend(graph.get(vertex, []))
+    print()
+
 
 def main():
     questions = [
@@ -110,7 +156,7 @@ def main():
             choices=[
                 "Activity Selection", "Fractional Knapsack", "Huffman Coding",
                 "Kruskal's Algorithm", "Prim's Algorithm", "Dijkstra's Algorithm",
-                "Merge Sort", "Quick Sort", "Floyd-Warshall Algorithm"
+                "Merge Sort", "Quick Sort", "Floyd-Warshall Algorithm", "Depth First Search", "Breadth First Search"
             ],
         )
     ]
@@ -134,6 +180,12 @@ def main():
         run_quick_sort()
     elif answers["algorithm"] == "Floyd-Warshall Algorithm":
         run_floyd_warshall()
+    elif answers["algorithm"] == "Depth First Search":
+        run_depth_first_search()
+    elif answers["algorithm"] == "Breadth First Search":
+        run_breadth_first_search()
+    
+
 
 if __name__ == "__main__":
     main()
