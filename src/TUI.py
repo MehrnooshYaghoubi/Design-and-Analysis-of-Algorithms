@@ -8,7 +8,15 @@ from rich.console import Console
 from rich.text import Text
 from rich.table import Table
 import sys
-
+from design_paradigms.greedy_algorithms.activity_selection import activity_selection
+from design_paradigms.greedy_algorithms.fractional_knapsack import fractional_knapsack
+from design_paradigms.greedy_algorithms.huffman_coding import huffman_coding
+from design_paradigms.greedy_algorithms.kruskals_algorithm import kruskals_algorithm
+from design_paradigms.greedy_algorithms.prims_algorithm import prims_algorithm
+from graph_algorithms.dijkstras_algorithm import dijkstra
+from design_paradigms.divide_and_conquer.quick_sort import quick_sort
+from design_paradigms.divide_and_conquer.merge_sort import merge_sort
+from design_paradigms.dynamic_programming.floyd_warshall import floyd_warshall
 class AlgorithmApp(App):
     """A TUI for selecting and exploring algorithms using Tree widget."""
 
