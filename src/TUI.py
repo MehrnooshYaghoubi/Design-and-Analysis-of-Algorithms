@@ -17,6 +17,9 @@ from graph_algorithms.dijkstras_algorithm import dijkstra
 from design_paradigms.divide_and_conquer.quick_sort import quick_sort
 from design_paradigms.divide_and_conquer.merge_sort import merge_sort
 from design_paradigms.dynamic_programming.floyd_warshall import floyd_warshall
+
+
+
 class AlgorithmApp(App):
     """A TUI for selecting and exploring algorithms using Tree widget."""
 
