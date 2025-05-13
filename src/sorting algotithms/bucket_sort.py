@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# Author: OMKAR PATHAK
-# This program will illustrate how to implement bucket sort algorithm
-
 # Wikipedia says: Bucket sort, or bin sort, is a sorting algorithm that works by distributing the
 # elements of an array into a number of buckets. Each bucket is then sorted individually, either using
 # a different sorting algorithm, or by recursively applying the bucket sorting algorithm. It is a
@@ -53,5 +49,5 @@ def bucketSort(myList, bucketSize=DEFAULT_BUCKET_SIZE):
     return sortedArray
 
 if __name__ == '__main__':
-    sortedArray = bucketSort([12, 23, 4, 5, 3, 2, 12, 81, 56, 95])
+    sortedArray = bucketSort([12, 23, 4, 5, 3, 2, 12, 81, 56, 95, 2, 1, 1])
     print(sortedArray)
