@@ -13,20 +13,7 @@ from __future__ import print_function
 
 
 def shell_sort(collection):
-    """Pure implementation of shell sort algorithm in Python
-    :param collection:  Some mutable ordered collection with heterogeneous
-    comparable items inside
-    :return:  the same collection ordered by ascending
 
-    >>> shell_sort([0, 5, 3, 2, 2])
-    [0, 2, 2, 3, 5]
-
-    >>> shell_sort([])
-    []
-
-    >>> shell_sort([-2, -5, -45])
-    [-45, -5, -2]
-    """
     # Marcin Ciura's gap sequence
     gaps = [701, 301, 132, 57, 23, 10, 4, 1]
 
@@ -44,11 +31,7 @@ def shell_sort(collection):
     return collection
 
 if __name__ == '__main__':
-    try:
-        raw_input          # Python 2
-    except NameError:
-        raw_input = input  # Python 3
 
-    user_input = raw_input('Enter numbers separated by a comma:\n').strip()
+    user_input = input('Enter numbers separated by a comma:\n').strip()
     unsorted = [int(item) for item in user_input.split(',')]
     print(shell_sort(unsorted))
