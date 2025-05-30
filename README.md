@@ -1,6 +1,5 @@
 # Algorithms Explorer (KlugNet)
-
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![temp](https://i.pinimg.com/originals/41/3e/f4/413ef4fe169a7907f0d5f09b69c2ebde.gif)
 
 ## Overview
 
