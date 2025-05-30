@@ -1,4 +1,5 @@
 # Tauri + React
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 This template should help get you started developing with Tauri and React in Vite.
 
