@@ -56,11 +56,14 @@ const JsonCodeBlock = () => {
     try {
       const parsedJson = JSON.parse(code);
 
+      const copyOfselectedAlgo = selectedAlgorithm;
+      const start = performance.now();
       const result = await invoke("execute_json", {
         jsonData: parsedJson,
         selectedAlgo: currentAlgo,
       });
-
+      const end = performance.now();
+      const executionTime = end - start;
       setExecutionResult({
         success: true,
         message: "Success",
@@ -68,7 +71,12 @@ const JsonCodeBlock = () => {
 
       setResults([
         ...Results,
-        { text: result, time: new Date().toLocaleTimeString() },
+        {
+          text: result,
+          time: new Date().toLocaleTimeString(),
+          algo: copyOfselectedAlgo,
+          duration: executionTime.toFixed(2) + " ms",
+        },
       ]);
     } catch (error) {
       setExecutionResult({
@@ -104,21 +112,390 @@ const JsonCodeBlock = () => {
     reader.readAsText(file);
   };
 
+  function generateRandomKruskalInput(
+    numVertices = 4,
+    numEdges = 5,
+    maxWeight = 20
+  ) {
+    const edges = new Set();
+    const edgeList = [];
+
+    // Ensure we don't have more edges than possible in an undirected graph
+    const maxPossibleEdges = (numVertices * (numVertices - 1)) / 2;
+    numEdges = Math.min(numEdges, maxPossibleEdges);
+
+    while (edgeList.length < numEdges) {
+      const src = Math.floor(Math.random() * numVertices);
+      let dest = Math.floor(Math.random() * numVertices);
+
+      // Ensure src != dest and the edge hasn't already been added (undirected, so (1,2) == (2,1))
+      while (
+        dest === src ||
+        edges.has(`${Math.min(src, dest)}-${Math.max(src, dest)}`)
+      ) {
+        dest = Math.floor(Math.random() * numVertices);
+      }
+
+      const weight = Math.floor(Math.random() * maxWeight) + 1;
+
+      edges.add(`${Math.min(src, dest)}-${Math.max(src, dest)}`);
+      edgeList.push({ src, dest, weight });
+    }
+
+    return {
+      num_vertices: numVertices,
+      edges: edgeList,
+    };
+  }
+
+  function generateRandomKnapsackInput(
+    numItems = 5,
+    maxValue = 100,
+    maxWeight = 50,
+    capacity = 100.0
+  ) {
+    const items = [];
+
+    for (let i = 0; i < numItems; i++) {
+      const value = parseFloat((Math.random() * maxValue + 1).toFixed(2));
+      const weight = parseFloat((Math.random() * maxWeight + 1).toFixed(2));
+      items.push({ value, weight });
+    }
+
+    return {
+      capacity: parseFloat(capacity.toFixed(2)),
+      items,
+    };
+  }
+
+  function generateRandomHuffmanInput(numSymbols = 6) {
+    const result = {};
+    const alphabet = "abcdefghijklmnopqrstuvwxyz";
+    const usedChars = new Set();
+
+    while (Object.keys(result).length < numSymbols) {
+      const char = alphabet[Math.floor(Math.random() * alphabet.length)];
+      if (!usedChars.has(char)) {
+        usedChars.add(char);
+        const frequency = Math.floor(Math.random() * 50) + 1; // frequency between 1 and 50
+        result[char] = frequency;
+      }
+    }
+
+    return result;
+  }
+
+  function generateRandomPrimInput(numVertices = 5, edgeProbability = 0.5) {
+    const edges = [];
+
+    for (let i = 0; i < numVertices; i++) {
+      for (let j = i + 1; j < numVertices; j++) {
+        if (Math.random() < edgeProbability) {
+          edges.push({
+            src: i,
+            dest: j,
+            weight: Math.floor(Math.random() * 20) + 1, // weight between 1 and 20
+          });
+        }
+      }
+    }
+
+    return {
+      num_vertices: numVertices,
+      edges: edges,
+    };
+  }
+
+  function generateRandomActivities(
+    numActivities = 5,
+    maxStart = 10,
+    maxDuration = 5
+  ) {
+    const activities = [];
+
+    for (let i = 0; i < numActivities; i++) {
+      const start = Math.floor(Math.random() * maxStart);
+      const duration = Math.floor(Math.random() * maxDuration) + 1;
+      const finish = start + duration;
+
+      activities.push({ start, finish });
+    }
+
+    // Optional: sort by finish time to simulate greedy approach input
+    activities.sort((a, b) => a.finish - b.finish);
+
+    return activities;
+  }
+
+  function generateRandomPointsJSON(count = 10, min = -100, max = 100) {
+    const points = [];
+
+    for (let i = 0; i < count; i++) {
+      const x = +(Math.random() * (max - min) + min).toFixed(2);
+      const y = +(Math.random() * (max - min) + min).toFixed(2);
+      points.push({ x, y });
+    }
+
+    return JSON.stringify(points, null, 2); // Pretty-printed JSON
+  }
+
   const onRandomClick = () => {
+    if (selectedAlgorithm === "kruskals algorithm") {
+      const numVertices = prompt(
+        "Enter the number of vertices (default: 4)",
+        "4"
+      );
+      const numEdges = prompt("Enter the number of edges (default: 5)", "5");
+      const maxWeight = prompt(
+        "Enter the maximum weight for edges (default: 20)",
+        "20"
+      );
+      if (numVertices === null || numEdges === null || maxWeight === null)
+        return;
+      if (numVertices === "" || numEdges === "" || maxWeight === "") return;
+      if (isNaN(numVertices) || isNaN(numEdges) || isNaN(maxWeight)) {
+        setExecutionResult({
+          success: false,
+          message: "All inputs must be numbers.",
+        });
+        return;
+      }
+      const randomInput = generateRandomKruskalInput(
+        parseInt(numVertices),
+        parseInt(numEdges),
+        parseInt(maxWeight)
+      );
+
+      setCode(JSON.stringify(randomInput, null, 2));
+      return;
+    }
+
+    if (selectedAlgorithm === "fractional knapsack") {
+      const numItems = prompt("Enter the number of items (default: 5)", "5");
+      const maxValue = prompt("Enter the maximum value (default: 100)", "100");
+      const maxWeight = prompt("Enter the maximum weight (default: 50)", "50");
+      const capacity = prompt(
+        "Enter the knapsack capacity (default: 100.0)",
+        "100.0"
+      );
+      if (
+        numItems === null ||
+        maxValue === null ||
+        maxWeight === null ||
+        capacity === null
+      )
+        return;
+      if (
+        numItems === "" ||
+        maxValue === "" ||
+        maxWeight === "" ||
+        capacity === ""
+      )
+        return;
+      if (
+        isNaN(numItems) ||
+        isNaN(maxValue) ||
+        isNaN(maxWeight) ||
+        isNaN(capacity)
+      ) {
+        setExecutionResult({
+          success: false,
+          message: "All inputs must be numbers.",
+        });
+        return;
+      }
+      const randomInput = generateRandomKnapsackInput(
+        parseInt(numItems),
+        parseFloat(maxValue),
+        parseFloat(maxWeight),
+        parseFloat(capacity)
+      );
+
+      setCode(JSON.stringify(randomInput, null, 2));
+      return;
+    }
+
+    if (selectedAlgorithm === "huffman coding") {
+      const numSymbols = prompt(
+        "Enter the number of symbols (default: 6)",
+        "6"
+      );
+      if (numSymbols === null || numSymbols === "") return;
+      if (isNaN(numSymbols)) {
+        setExecutionResult({
+          success: false,
+          message: "Number of symbols must be a number.",
+        });
+        return;
+      }
+      const randomInput = generateRandomHuffmanInput(parseInt(numSymbols));
+
+      setCode(JSON.stringify(randomInput, null, 2));
+      return;
+    }
+
+    if (selectedAlgorithm === "prims algorithm") {
+      const numVertices = prompt(
+        "Enter the number of vertices (default: 5)",
+        "5"
+      );
+      const edgeProbability = prompt(
+        "Enter the edge probability (default: 0.5)",
+        "0.5"
+      );
+      if (numVertices === null || edgeProbability === null) return;
+      if (numVertices === "" || edgeProbability === "") return;
+      if (isNaN(numVertices) || isNaN(edgeProbability)) {
+        setExecutionResult({
+          success: false,
+          message: "All inputs must be numbers.",
+        });
+        return;
+      }
+      const randomInput = generateRandomPrimInput(
+        parseInt(numVertices),
+        parseFloat(edgeProbability)
+      );
+
+      setCode(JSON.stringify(randomInput, null, 2));
+      return;
+    }
+
+    if (selectedAlgorithm === "activity selection") {
+      const numActivities = prompt(
+        "Enter the number of activities (default: 5)",
+        "5"
+      );
+      const maxStart = prompt(
+        "Enter the maximum start time (default: 10)",
+        "10"
+      );
+      const maxDuration = prompt(
+        "Enter the maximum duration (default: 5)",
+        "5"
+      );
+      if (numActivities === null || maxStart === null || maxDuration === null)
+        return;
+      if (numActivities === "" || maxStart === "" || maxDuration === "") return;
+      if (isNaN(numActivities) || isNaN(maxStart) || isNaN(maxDuration)) {
+        setExecutionResult({
+          success: false,
+          message: "All inputs must be numbers.",
+        });
+        return;
+      }
+      const randomInput = generateRandomActivities(
+        parseInt(numActivities),
+        parseInt(maxStart),
+        parseInt(maxDuration)
+      );
+
+      setCode(JSON.stringify(randomInput, null, 2));
+      return;
+    }
+
+    if (selectedAlgorithm === "closest pair of points") {
+      const count = prompt("Enter the number of points (default: 10)", "10");
+      const min = prompt(
+        "Enter the minimum coordinate value (default: -100)",
+        "-100"
+      );
+      const max = prompt(
+        "Enter the maximum coordinate value (default: 100)",
+        "100"
+      );
+      if (count === null || min === null || max === null) return;
+      if (count === "" || min === "" || max === "") return;
+      if (isNaN(count) || isNaN(min) || isNaN(max)) {
+        setExecutionResult({
+          success: false,
+          message: "All inputs must be numbers.",
+        });
+        return;
+      }
+      const randomInput = generateRandomPointsJSON(
+        parseInt(count),
+        parseFloat(min),
+        parseFloat(max)
+      );
+
+      setCode(randomInput);
+      return;
+    }
+
     const range = prompt("Inter The Length Of Random Input", "10");
     if (range === null || range === "") return;
 
-    const LOWER_BOUND = -1000000;
-    const UPPER_BOUND = 1000000;
-
-    const randomArray = Array.from(
-      { length: parseInt(range) },
-      () =>
-        Math.floor(Math.random() * (UPPER_BOUND - LOWER_BOUND + 1)) +
-        LOWER_BOUND
+    const type = prompt(
+      "Inter The Type Of Random Input (i32, f64, String)",
+      "i32"
     );
 
-    const toBeJson = { arr: randomArray };
+    if (!["i32", "f64", "String"].includes(type)) {
+      setExecutionResult({
+        success: false,
+        message: "Invalid type selected. Please choose i32, f64, or String.",
+      });
+      return;
+    }
+    let LOWER_BOUND = 0;
+    let UPPER_BOUND = 1000000;
+
+    if (type == "i32" || type == "f65") {
+      const bounds = prompt(
+        "Enter the lower and upper bounds (e.g., 0,1000000)",
+        "0,1000000"
+      );
+
+      if (bounds === null || bounds === "") return;
+      if (!bounds.includes(",")) {
+        setExecutionResult({
+          success: false,
+          message: "Invalid bounds format. Use 'lower,upper'.",
+        });
+        return;
+      }
+      if (bounds.split(",").length !== 2) {
+        setExecutionResult({
+          success: false,
+          message: "Please provide exactly two bounds.",
+        });
+        return;
+      }
+      if (isNaN(bounds.split(",")[0]) || isNaN(bounds.split(",")[1])) {
+        setExecutionResult({
+          success: false,
+          message: "Bounds must be numbers.",
+        });
+        return;
+      }
+
+      LOWER_BOUND = parseInt(bounds.split(",")[0]);
+      UPPER_BOUND = parseInt(bounds.split(",")[1]);
+    }
+
+    if (type === null || type === "") return;
+
+    const randomArray = Array.from({ length: parseInt(range) }, () => {
+      if (type === "i32") {
+        return (
+          Math.floor(Math.random() * (UPPER_BOUND - LOWER_BOUND + 1)) +
+          LOWER_BOUND
+        );
+      } else if (type === "f64") {
+        return Math.random() * (UPPER_BOUND - LOWER_BOUND) + LOWER_BOUND;
+      } else if (type === "String") {
+        const chars =
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let result = "";
+        for (let i = 0; i < 10; i++) {
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+      }
+    });
+
+    const toBeJson = { type: type, arr: randomArray };
 
     setCode(JSON.stringify(toBeJson, null, 2));
   };

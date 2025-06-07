@@ -3,7 +3,7 @@ use std::{collections::HashMap, fmt::Debug};
 use serde::{Deserialize, Serialize};
 use serde_json::{from_value, Value};
 use Algorithms::{
-    divide_and_conquer::binary_search,
+    divide_and_conquer::{binary_search, closest_pair},
     graph_algorithms::{bellman_ford, bfs, dfs, dijkstra},
     greedy_algorithms::{
         activity_selection, build_tree, fractional_knapsack::fractional_knapsack, generate_codes,
@@ -122,13 +122,6 @@ struct InputKruskal {
 #[tauri::command]
 fn execute_json(json_data: serde_json::Value, selected_algo: String) -> Result<String, String> {
     println!("Received JSON: {:?}", json_data);
-    // Your Rust processing logic here
-    // For example:
-
-    let ty = json_data
-        .get("type")
-        .and_then(Value::as_str)
-        .ok_or("Missing or invalid 'type' field")?;
 
     match selected_algo.as_str() {
         "bubble sort"
@@ -176,8 +169,11 @@ fn execute_json(json_data: serde_json::Value, selected_algo: String) -> Result<S
             let arr_val = json_data
                 .get("arr")
                 .ok_or("Missing or invalid 'arr' field")?;
-            let mut arr = convert_json_to_vec::<i32>(arr_val)
+            let arr = convert_json_to_vec::<i32>(arr_val)
                 .ok_or("Failed to parse array for radix sort")?;
+
+            // Filter out negative values
+            let mut arr: Vec<i32> = arr.into_iter().filter(|&x| x >= 0).collect();
 
             radix_sort(&mut arr);
 
@@ -300,7 +296,12 @@ fn execute_json(json_data: serde_json::Value, selected_algo: String) -> Result<S
             let dist = dijkstra(&adj_list, input.start);
             Ok(format!("{:?}", dist))
         }
-        // Add custom algorithm cases here as needed
+        "activity selection" => {
+            let mut activities: Vec<Activity> =
+                serde_json::from_value(json_data.clone()).map_err(|_| "Invalid JSON")?;
+            let selected = activity_selection(&mut activities);
+            Ok(format!("{:?}", selected))
+        }
         "binary search" => {
             #[derive(serde::Deserialize)]
             struct InputType {
@@ -356,16 +357,18 @@ fn execute_json(json_data: serde_json::Value, selected_algo: String) -> Result<S
             }
         }
 
-        // "closest pair of points" => {
-        //     let points: Vec<Algorithms::divide_and_conquer::closest_pair_of_points::Point> =
-        //         serde_json::from_value(json_data.clone()).map_err(|_| "Invalid JSON")?;
+        "closest pair of points" => {
+            let points: Vec<Algorithms::divide_and_conquer::closest_pair_of_points::Point> =
+                serde_json::from_value(json_data.clone()).map_err(|_| "Invalid JSON")?;
 
-        //     let (p1, p2, dist) = closest_pair(&points);
-        //     Ok(format!(
-        //         "Closest points: ({:?}), ({:?}), Distance: {:.6}",
-        //         p1, p2, dist
-        //     ))
-        // }
+            match closest_pair(&points) {
+                Some((p1, p2, dist)) => Ok(format!(
+                    "Closest points: ({:?}), ({:?}), Distance: {:.6}",
+                    p1, p2, dist
+                )),
+                None => Err("Need at least two points".into()),
+            }
+        }
         _ => return Err("Wrong Algorithm Selected".into()),
     }
 }

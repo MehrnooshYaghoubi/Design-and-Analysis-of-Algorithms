@@ -18,5 +18,7 @@
     "breadth first search": "{\"graph\": [[1, 2], [0, 3], [0], [1]], \"start\": 0}",
     "depth first search": "{\"graph\": [[1, 2], [0, 3], [0], [1]], \"start\": 0}",
     "dijkstras algorithm": "{\"adj_list\": [[{\"node\": 1, \"cost\": 4}, {\"node\": 2, \"cost\": 1}], [{\"node\": 3, \"cost\": 1}], [{\"node\": 1, \"cost\": 2}, {\"node\": 3, \"cost\": 5}], []], \"start\": 0}",
-    "binary search": "{\"type\": \"i32\",\n\"arr\": [1, 3, 5, 7, 9], \"target\": 7}"
+    "binary search": "{\"type\": \"i32\",\n\"arr\": [1, 3, 5, 7, 9], \"target\": 7}",
+    "closest pair of points": "{\"points\": [{\"x\": 2.0, \"y\": 3.0}, {\"x\": 12.0, \"y\": 30.0}, {\"x\": 40.0, \"y\": 50.0}, {\"x\": 5.0, \"y\": 1.0}, {\"x\": 12.0, \"y\": 10.0}, {\"x\": 3.0, \"y\": 4.0}]}"
+
 }

@@ -1,9 +1,8 @@
-use std::cmp::Ordering;
 use std::f64;
 
 use serde::Deserialize;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize)]
 pub struct Point {
     pub x: f64,
     pub y: f64,
@@ -11,15 +10,19 @@ pub struct Point {
 
 impl Point {
     fn distance(&self, other: &Point) -> f64 {
-        (self.x - other.x).powi(2) + ((self.y - other.y).powi(2)).sqrt()
+        ((self.x - other.x).powi(2) + (self.y - other.y).powi(2)).sqrt()
     }
 }
 
-pub fn closest_pair(points: &[Point]) -> (Point, Point, f64) {
+pub fn closest_pair(points: &[Point]) -> Option<(Point, Point, f64)> {
+    if points.len() < 2 {
+        return None;
+    }
+
     let mut points_sorted_x = points.to_vec();
     points_sorted_x.sort_by(|a, b| a.x.partial_cmp(&b.x).unwrap());
 
-    closest_pair_recursive(&points_sorted_x)
+    Some(closest_pair_recursive(&points_sorted_x))
 }
 
 fn closest_pair_recursive(points: &[Point]) -> (Point, Point, f64) {
@@ -31,20 +34,13 @@ fn closest_pair_recursive(points: &[Point]) -> (Point, Point, f64) {
     let mid = n / 2;
     let mid_point = points[mid];
 
-    let (left_pair, left_dist) = {
-        let (p1, p2, d) = closest_pair_recursive(&points[..mid]);
-        (p1, p2, d)
-    };
+    let (p1_l, p2_l, d_l) = closest_pair_recursive(&points[..mid]);
+    let (p1_r, p2_r, d_r) = closest_pair_recursive(&points[mid..]);
 
-    let (right_pair, right_dist) = {
-        let (p1, p2, d) = closest_pair_recursive(&points[mid..]);
-        (p1, p2, d)
-    };
-
-    let (mut min_pair, mut min_dist) = if left_dist < right_dist {
-        (left_pair, left_dist)
+    let (mut min_pair, mut min_dist) = if d_l < d_r {
+        ((p1_l, p2_l), d_l)
     } else {
-        (right_pair, right_dist)
+        ((p1_r, p2_r), d_r)
     };
 
     let strip: Vec<Point> = points
@@ -80,21 +76,23 @@ fn brute_force_closest_pair(points: &[Point]) -> (Point, Point, f64) {
 }
 
 fn closest_pair_in_strip(strip: &[Point], min_dist: f64) -> ((Point, Point), f64) {
+    let mut sorted_strip = strip.to_vec();
+    sorted_strip.sort_by(|a, b| a.y.partial_cmp(&b.y).unwrap());
+
     let mut min_dist = min_dist;
-    let mut min_pair = (strip[0], strip[1]);
-    let n = strip.len();
+    let mut min_pair = (sorted_strip[0], sorted_strip[1]);
 
-    strip.sort_by(|a, b| a.y.partial_cmp(&b.y).unwrap());
+    for i in 0..sorted_strip.len() {
+        for j in i + 1..sorted_strip.len() {
+            if (sorted_strip[j].y - sorted_strip[i].y) >= min_dist {
+                break;
+            }
 
-    for i in 0..n {
-        let mut j = i + 1;
-        while j < n && (strip[j].y - strip[i].y) < min_dist {
-            let dist = strip[i].distance(&strip[j]);
+            let dist = sorted_strip[i].distance(&sorted_strip[j]);
             if dist < min_dist {
                 min_dist = dist;
-                min_pair = (strip[i], strip[j]);
+                min_pair = (sorted_strip[i], sorted_strip[j]);
             }
-            j += 1;
         }
     }
 
