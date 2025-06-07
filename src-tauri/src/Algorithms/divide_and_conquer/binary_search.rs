@@ -1,19 +1,20 @@
-pub fn binary_search(arr: &[i32], target: i32) -> i32 {
+pub fn binary_search<T: PartialOrd>(arr: &[T], target: &T) -> Option<usize> {
     let mut left = 0;
-    let mut right = arr.len() as i32 - 1;
+    let mut right = arr.len();
 
-    while left <= right {
+    while left < right {
         let mid = left + (right - left) / 2;
-        let mid_val = arr[mid as usize];
-
-        if mid_val == target {
-            return mid;
-        } else if mid_val < target {
-            left = mid + 1;
-        } else {
-            right = mid - 1;
+        match arr[mid].partial_cmp(target) {
+            Some(std::cmp::Ordering::Equal) => return Some(mid),
+            Some(std::cmp::Ordering::Less) => left = mid + 1,
+            Some(std::cmp::Ordering::Greater) => right = mid,
+            None => {
+                // Handle NaN or incomparable cases: treat as greater (skip) or less
+                // Here, treat as greater so go left
+                right = mid;
+            }
         }
     }
 
-    -1 // Target not found
+    None
 }

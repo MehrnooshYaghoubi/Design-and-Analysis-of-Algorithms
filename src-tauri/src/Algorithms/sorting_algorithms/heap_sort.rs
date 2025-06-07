@@ -1,4 +1,4 @@
-pub fn heap_sort(arr: &mut Vec<i32>) {
+pub fn heap_sort<T: PartialOrd>(arr: &mut [T]) {
     let n = arr.len();
 
     // Build max heap
@@ -6,24 +6,28 @@ pub fn heap_sort(arr: &mut Vec<i32>) {
         heapify(arr, n, i);
     }
 
-    // Extract elements from heap one by one
+    // Extract elements from heap
     for i in (1..n).rev() {
-        arr.swap(0, i); // Move current root to end
-        heapify(arr, i, 0); // Heapify reduced heap
+        arr.swap(0, i);
+        heapify(arr, i, 0);
     }
 }
 
-fn heapify(arr: &mut Vec<i32>, heap_size: usize, root_index: usize) {
+fn heapify<T: PartialOrd>(arr: &mut [T], heap_size: usize, root_index: usize) {
     let mut largest = root_index;
     let left = 2 * root_index + 1;
     let right = 2 * root_index + 2;
 
-    if left < heap_size && arr[left] > arr[largest] {
-        largest = left;
+    if left < heap_size {
+        if let Some(std::cmp::Ordering::Less) = arr[largest].partial_cmp(&arr[left]) {
+            largest = left;
+        }
     }
 
-    if right < heap_size && arr[right] > arr[largest] {
-        largest = right;
+    if right < heap_size {
+        if let Some(std::cmp::Ordering::Less) = arr[largest].partial_cmp(&arr[right]) {
+            largest = right;
+        }
     }
 
     if largest != root_index {

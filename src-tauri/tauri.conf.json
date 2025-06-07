@@ -13,6 +13,7 @@
     "windows": [
       {
         "title": "tauri-app",
+        "decorations": true,
         "width": 800,
         "height": 600
       }
