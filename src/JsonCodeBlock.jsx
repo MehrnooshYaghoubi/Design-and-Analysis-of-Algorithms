@@ -6,6 +6,7 @@ import Prism from "prismjs";
 import "prismjs/themes/prism.duotune-sea.css";
 import "prismjs/components/prism-json";
 import { Dices } from "lucide-react";
+
 const JsonCodeBlock = () => {
   const [code, setCode] = useState("");
   const [activeLine, setActiveLine] = useState(null);
@@ -239,7 +240,7 @@ const JsonCodeBlock = () => {
     return JSON.stringify(points, null, 2); // Pretty-printed JSON
   }
 
-  const onRandomClick = () => {
+  const onRandomClick = async () => {
     if (selectedAlgorithm === "kruskals algorithm") {
       const numVertices = prompt(
         "Enter the number of vertices (default: 4)",
@@ -260,13 +261,19 @@ const JsonCodeBlock = () => {
         });
         return;
       }
-      const randomInput = generateRandomKruskalInput(
-        parseInt(numVertices),
-        parseInt(numEdges),
-        parseInt(maxWeight)
-      );
+      // const randomInput = generateRandomKruskalInput(
+      //   parseInt(numVertices),
+      //   parseInt(numEdges),
+      //   parseInt(maxWeight)
+      // );
 
-      setCode(JSON.stringify(randomInput, null, 2));
+      const result = await invoke("generate_random_kruskal_input", {
+        num_vertices: numVertices,
+        num_edges: numEdges,
+        max_weight: maxWeight,
+      });
+
+      setCode(JSON.stringify(result, null, 2));
       return;
     }
 
@@ -304,14 +311,21 @@ const JsonCodeBlock = () => {
         });
         return;
       }
-      const randomInput = generateRandomKnapsackInput(
-        parseInt(numItems),
-        parseFloat(maxValue),
-        parseFloat(maxWeight),
-        parseFloat(capacity)
-      );
+      // const randomInput = generateRandomKnapsackInput(
+      //   parseInt(numItems),
+      //   parseFloat(maxValue),
+      //   parseFloat(maxWeight),
+      //   parseFloat(capacity)
+      // );
 
-      setCode(JSON.stringify(randomInput, null, 2));
+      const result = await invoke("generate_random_knapsack_input", {
+        num_items: numItems,
+        max_value: maxValue,
+        max_weight: maxWeight,
+        capacity: capacity,
+      });
+
+      setCode(JSON.stringify(result, null, 2));
       return;
     }
 
@@ -328,9 +342,12 @@ const JsonCodeBlock = () => {
         });
         return;
       }
-      const randomInput = generateRandomHuffmanInput(parseInt(numSymbols));
+      // const randomInput = generateRandomHuffmanInput(parseInt(numSymbols));
+      const result = await invoke("generate_random_huffman_input", {
+        numSymbols: parseInt(numSymbols),
+      });
 
-      setCode(JSON.stringify(randomInput, null, 2));
+      setCode(JSON.stringify(result, null, 2));
       return;
     }
 
@@ -352,12 +369,17 @@ const JsonCodeBlock = () => {
         });
         return;
       }
-      const randomInput = generateRandomPrimInput(
-        parseInt(numVertices),
-        parseFloat(edgeProbability)
-      );
+      // const randomInput = generateRandomPrimInput(
+      //   parseInt(numVertices),
+      //   parseFloat(edgeProbability)
+      // );
 
-      setCode(JSON.stringify(randomInput, null, 2));
+      const result = await invoke("generate_random_prim_input", {
+        numVertices: parseInt(numVertices),
+        edgeProbability: parseFloat(edgeProbability),
+      });
+
+      setCode(JSON.stringify(result, null, 2));
       return;
     }
 
@@ -384,13 +406,24 @@ const JsonCodeBlock = () => {
         });
         return;
       }
-      const randomInput = generateRandomActivities(
-        parseInt(numActivities),
-        parseInt(maxStart),
-        parseInt(maxDuration)
-      );
+      // const randomInput = generateRandomActivities(
+      //   parseInt(numActivities),
+      //   parseInt(maxStart),
+      //   parseInt(maxDuration)
+      // );
 
-      setCode(JSON.stringify(randomInput, null, 2));
+      // const result = await invoke("generate_random_activities", {
+      //   num_activities: numActivities,
+      //   max_start: maxStart,
+      //   max_duration: maxDuration,
+      // });
+      const result = await invoke("generate_random_activities", {
+        numActivities: parseInt(numActivities),
+        maxStart: parseInt(maxStart),
+        maxDuration: parseInt(maxDuration),
+      });
+
+      setCode(JSON.stringify(result, null, 2));
       return;
     }
 
@@ -413,13 +446,18 @@ const JsonCodeBlock = () => {
         });
         return;
       }
-      const randomInput = generateRandomPointsJSON(
-        parseInt(count),
-        parseFloat(min),
-        parseFloat(max)
-      );
+      // const randomInput = generateRandomPointsJSON(
+      //   parseInt(count),
+      //   parseFloat(min),
+      //   parseFloat(max)
+      // );
+      const result = await invoke("generate_random_points_closest_json", {
+        count: parseInt(count),
+        min: parseFloat(min),
+        max: parseFloat(max),
+      });
 
-      setCode(randomInput);
+      setCode(result);
       return;
     }
 
@@ -476,28 +514,34 @@ const JsonCodeBlock = () => {
 
     if (type === null || type === "") return;
 
-    const randomArray = Array.from({ length: parseInt(range) }, () => {
-      if (type === "i32") {
-        return (
-          Math.floor(Math.random() * (UPPER_BOUND - LOWER_BOUND + 1)) +
-          LOWER_BOUND
-        );
-      } else if (type === "f64") {
-        return Math.random() * (UPPER_BOUND - LOWER_BOUND) + LOWER_BOUND;
-      } else if (type === "String") {
-        const chars =
-          "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let result = "";
-        for (let i = 0; i < 10; i++) {
-          result += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return result;
-      }
+    // const randomArray = Array.from({ length: parseInt(range) }, () => {
+    //   if (type === "i32") {
+    //     return (
+    //       Math.floor(Math.random() * (UPPER_BOUND - LOWER_BOUND + 1)) +
+    //       LOWER_BOUND
+    //     );
+    //   } else if (type === "f64") {
+    //     return Math.random() * (UPPER_BOUND - LOWER_BOUND) + LOWER_BOUND;
+    //   } else if (type === "String") {
+    //     const chars =
+    //       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    //     let result = "";
+    //     for (let i = 0; i < 10; i++) {
+    //       result += chars.charAt(Math.floor(Math.random() * chars.length));
+    //     }
+    //     return result;
+    //   }
+    // });
+    const result = await invoke("generate_random_array", {
+      count: parseInt(range), // Ensure the range is an integer
+      dataType: type, // Pass the type as a string ("i32", "f64", or "String")
+      min: LOWER_BOUND, // Pass the lower bound
+      max: UPPER_BOUND, // Pass the upper bound
     });
 
-    const toBeJson = { type: type, arr: randomArray };
+    // const toBeJson = { type: type, arr: randomArray };
 
-    setCode(JSON.stringify(toBeJson, null, 2));
+    setCode(JSON.stringify(result, null, 2));
   };
 
   return (
